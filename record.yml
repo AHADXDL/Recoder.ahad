@@ -1,0 +1,45 @@
+name: Record
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "m3u8 link"
+        required: true
+      minutes:
+        description: "Stop after N minutes (0 = until you send /stop)"
+        default: "120"
+      name:
+        description: "File name"
+        default: "ClipByahad"
+      part_min:
+        description: "New file every N minutes (60 = auto-save every hour while recording continues)"
+        default: "60"
+      part_mb:
+        description: "...or every N MB, whichever comes first (github host: max 1950. gofile host: up to 4000)"
+        default: "1900"
+      host:
+        description: "Where the files go: github (max 2 GB per file) or gofile (4 GB files, one link)"
+        type: choice
+        options:
+          - github
+          - gofile
+        default: github
+      referer:
+        description: "Optional: website the link is played on (only if the link needs it)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write     # upload recordings to a Release
+  actions: write      # lets a long recording continue in a new run
+
+jobs:
+  record:
+    runs-on: ubuntu-latest
+    timeout-minutes: 355
+actions/upload-artifact@v4
+        with:
+          name: failed-uploads
+          path: rec_failed/
+          if-no-files-found: ignore
+          retention-days: 3
